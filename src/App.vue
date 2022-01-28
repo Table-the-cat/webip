@@ -1,7 +1,8 @@
 <template>
   <div id="app">
-    <router-link to="/ImgList">ImgList</router-link>
-    <router-link to="/ImgProcess">ImgProcess</router-link>
+    <el-row id="top-bar">
+      <router-link to="/ImgList">在线图像处理</router-link>
+    </el-row>
     <router-view/>
   </div>
 </template>
@@ -19,6 +20,26 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+a {
+  text-decoration:none ;
+  color: #cbf0fc;
+  font-size: 35px;
+}
+
+body {
+  margin: 0;
+}
+
+.router-link-active {
+  text-decoraction: none ;
+  color: #cbf0fc;
+}
+
+#top-bar {
+  background-color: #449bd0;
+  padding-top: 15px;
+  height: 75px;
 }
 </style>

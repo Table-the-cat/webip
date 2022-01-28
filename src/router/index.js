@@ -11,12 +11,17 @@ Vue.use(Element)
 export default new Router({
   routes: [
     {
+      path: '/',
+      name: 'home',
+      redirect: '/ImgList'
+    },
+    {
       path: '/ImgList',
       name: 'ImgList',
       component: ImgList
     },
     {
-      path: '/ImgProcess',
+      path: '/ImgProcess/:name',
       name: 'ImgProcess',
       component: ImgProcess
     }
