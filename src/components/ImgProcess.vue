@@ -1,33 +1,86 @@
 <template>
   <div id="img-process">
     <el-row>
-      <h2>滤镜算法Demo</h2>
-    </el-row>
-
-    <el-row>
-      <el-col :span="24">
-        <h3>滤镜算法处理效果图</h3>
-        <div class="canvas-box">
-          <canvas width="1650" height="600" id="myCanvas"></canvas>
+      <el-col :span="3">
+        <div class="menu-title">
+          <h3>操作选项</h3>
         </div>
-      </el-col>
-    </el-row>
+        <el-menu
+          default-active="2"
+          class="el-menu-vertical-demo"
+          @open="handleOpen"
+          @close="handleClose">
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-s-operation"></i>
+              <span>调整</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="1-1">
+                <el-popover
+                  placement="right"
+                  title="拖拽"
+                  width="200"
+                  trigger="hover"
+                  content="按住鼠标左键并移动，可以拖拽图片">
+                  <el-button slot="reference">拖拽</el-button>
+                </el-popover>
+              </el-menu-item>
+              <el-menu-item index="1-2">
+                <el-popover
+                  placement="right"
+                  title="缩放"
+                  width="200"
+                  trigger="hover"
+                  content="按住alt键并滚动鼠标滚轮，可以缩放图片">
+                  <el-button slot="reference">缩放</el-button>
+                </el-popover>
+              </el-menu-item>
+              <el-menu-item index="1-2">
+                <el-popover
+                  placement="right"
+                  title="缩放"
+                  width="200"
+                  trigger="hover"
+                  content="按住alt键的同时按住鼠标左键，同时移动鼠标，可以旋转图片">
+                  <el-button slot="reference">旋转</el-button>
+                </el-popover>
+              </el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
 
-    <el-row>
-      <el-col :span="2">
-        <el-button v-on:click="back">原图</el-button>
+          <el-submenu index="2">
+            <template slot="title">
+              <i class="el-icon-camera"></i>
+              <span>滤镜效果</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="2-1" v-on:click="back">
+                <el-button v-on:click="back">还原</el-button>
+              </el-menu-item>
+              <el-menu-item index="2-2">
+                <el-button v-on:click="turnGrey">灰度</el-button>
+              </el-menu-item>
+              <el-menu-item index="2-3">
+                <el-button v-on:click="turnMonochrome">黑白</el-button>
+              </el-menu-item>
+              <el-menu-item index="2-4">
+                <el-button v-on:click="turnRGBReverse">负片</el-button>
+              </el-menu-item>
+              <el-menu-item index="2-5">
+                <el-button v-on:click="turnConvolution">卷积</el-button>
+              </el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+        </el-menu>
       </el-col>
-      <el-col :span="2">
-        <el-button v-on:click="turnGrey">灰色</el-button>
-      </el-col>
-      <el-col :span="2">
-        <el-button v-on:click="turnMonochrome">黑白</el-button>
-      </el-col>
-      <el-col :span="2">
-        <el-button v-on:click="turnRGBReverse">反色</el-button>
-      </el-col>
-      <el-col :span="2">
-        <el-button v-on:click="turnConvolution">卷积</el-button>
+
+      <el-col :span="21" id="img-proc">
+        <h3><i class="el-icon-picture-outline" style="font-size: larger"></i><span>  滤镜算法处理效果图</span></h3>
+        <div class="canvas-box">
+          <canvas width="1487" height="800" id="myCanvas"></canvas>
+        </div>
       </el-col>
     </el-row>
 
@@ -41,36 +94,43 @@ export default {
     back: function () {
       ctx.setTransform(1, 0, 0, 1, 0, 0) // 重置canvas坐标(重置变换矩阵)
       ctx.clearRect(0, 0, cvs.width, cvs.height)
-      ctx.drawImage(img, 0, 0, 512, 288)
+      ctx.drawImage(img, 0, 0, processImg.initWidth, processImg.initHeight)
 
       // 重置各参数
       processImg.position.x = 0
       processImg.position.y = 0
-      processImg.width = 512
-      processImg.height = 288
+      processImg.width = processImg.initWidth
+      processImg.height = processImg.initHeight
       processImg.imgSrc = img
       PO.x = 0
       PO.y = 0
+      ctx.translate(processImg.width / 2, processImg.height / 2)
     },
     turnGrey: function () {
-      ctx.clearRect(0, 0, cvs.width, cvs.height)
+      ctx.clearRect(-cvs.width, -cvs.height, cvs.width, cvs.height)
       curImage(grey)
-      ctx.drawImage(processImg.imgSrc, processImg.position.x, processImg.position.y, processImg.width, processImg.height)
+      ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
     },
     turnMonochrome: function () {
-      ctx.clearRect(0, 0, cvs.width, cvs.height)
+      ctx.clearRect(-cvs.width, -cvs.height, cvs.width, cvs.height)
       curImage(monochrome)
-      ctx.drawImage(processImg.imgSrc, processImg.position.x, processImg.position.y, processImg.width, processImg.height)
+      ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
     },
     turnRGBReverse: function () {
-      ctx.clearRect(0, 0, cvs.width, cvs.height)
+      ctx.clearRect(-cvs.width, -cvs.height, cvs.width, cvs.height)
       curImage(RGBReverse)
-      ctx.drawImage(processImg.imgSrc, processImg.position.x, processImg.position.y, processImg.width, processImg.height)
+      ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
     },
     turnConvolution: function () {
-      ctx.clearRect(0, 0, cvs.width, cvs.height)
+      ctx.clearRect(-cvs.width, -cvs.height, cvs.width, cvs.height)
       curImage(convolution)
-      ctx.drawImage(processImg.imgSrc, processImg.position.x, processImg.position.y, processImg.width, processImg.height)
+      ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
+    },
+    handleOpen (key, keyPath) {
+      console.log(key, keyPath)
+    },
+    handleClose (key, keyPath) {
+      console.log(key, keyPath)
     }
   },
   created () {
@@ -78,11 +138,17 @@ export default {
       let imgPath = res.data.path
       cvs = document.getElementById('myCanvas')
       ctx = cvs.getContext('2d')
-      img = new Image(512, 288)
+      img = new Image()
+      img.onload = function () {
+        processImg.initWidth = this.width / 2
+        processImg.initHeight = this.height / 2
+        processImg.width = this.width / 2
+        processImg.height = this.height / 2
+
+        ctx.drawImage(processImg.imgSrc, 0, 0, processImg.width, processImg.height)
+        ctx.translate(processImg.width / 2, processImg.height / 2)
+      }
       img.src = '/api' + imgPath
-      ctx.drawImage(img, 0, 0, 512, 288)
-      // 获取canvas中图像的data属性（每个像素点的rgba）
-      imgData = ctx.getImageData(0, 0, 512, 288)
       processImg.imgSrc = img
 
       cvs.onmousedown = function (event) {
@@ -106,10 +172,12 @@ export default {
             PO = {x: PO.x + dx, y: PO.y + dy} // 更新PO
             processImg.position.x = PO.x
             processImg.position.y = PO.y
-            ctx.drawImage(processImg.imgSrc, processImg.position.x, processImg.position.y, processImg.width, processImg.height)
+
+            ctx.translate(dx, dy)
+            ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
           } else { // alt键按下，此时实现旋转功能
             ctx.rotate(dy * 0.5 * Math.PI / 180)
-            ctx.drawImage(processImg.imgSrc, processImg.position.x, processImg.position.y, processImg.width, processImg.height)
+            ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
           }
           beginX = x
           beginY = y // 记录移动后鼠标在屏幕坐标系的新位置
@@ -146,9 +214,9 @@ export default {
           ctx.clearRect(-cvs.width, -cvs.height, cvs.width * 2, cvs.height * 2)
           let delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)))
           scale += delta * 0.1
-          ctx.drawImage(processImg.imgSrc, PO.x, PO.y, 512 * scale, 288 * scale)
-          processImg.width = 512 * scale
-          processImg.height = 288 * scale
+          processImg.width = processImg.initWidth * scale
+          processImg.height = processImg.initHeight * scale
+          ctx.drawImage(processImg.imgSrc, -processImg.width / 2, -processImg.height / 2, processImg.width, processImg.height)
         }
       }
     }).catch(function (error) {
@@ -160,14 +228,13 @@ export default {
 let cvs
 let ctx
 let img
-let imgData
 let beginX
 let beginY
 let isDown = false
 let onCvs = false
 let altDown = false
 let PO = {x: 0, y: 0}
-let processImg = {imgSrc: img, width: 512, height: 288, position: PO}
+let processImg = {imgSrc: img, initWidth: 0, initHeight: 0, width: 0, height: 0, position: PO}
 
 function curImage (filter) {
   let canvas = document.createElement('canvas')
@@ -248,11 +315,22 @@ function convolution (imageData, ctx) {
 </script>
 
 <style scoped>
-.canvas-box{
+.canvas-box {
   border-style: solid;
   border-radius: 8px;
   border-color: #9b9b9b;
   border-width: 2px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+}
+
+.menu-title {
+  padding-top: 3px;
+  text-align: center;
+  background-color: #eef8fd;
+  height: 50px;
+}
+
+#img-proc {
+  padding-left: 5px;
 }
 </style>

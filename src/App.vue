@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <el-row id="top-bar">
-      <router-link to="/ImgList">在线图像处理</router-link>
+      <router-link to="/ImgList"><i class="el-icon-edit"></i>在线图像处理</router-link>
     </el-row>
     <router-view/>
   </div>
@@ -18,7 +18,6 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
 }
 
@@ -38,8 +37,12 @@ body {
 }
 
 #top-bar {
-  background-color: #449bd0;
+  background-color: #29313b;
   padding-top: 15px;
   height: 75px;
+  padding-left: 10px;
+  border-left-color: #44566e;
+  border-left-style: solid;
+  border-left-width: 20px;
 }
 </style>
