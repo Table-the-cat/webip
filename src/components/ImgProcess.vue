@@ -80,6 +80,19 @@
               <span>标注</span>
             </template>
             <el-menu-item-group>
+              <el-menu-item>
+                <span>画笔大小</span>
+                <input type="range" id="lwRange" min="1" max="10" value="1" style="width: 100px" />
+              </el-menu-item>
+              <el-menu-item>
+                <span>画笔颜色</span>
+                <input type="color" id="lcolor" value="#ffa500" />
+              </el-menu-item>
+              <el-menu-item>
+                撤销/重做
+                <el-button type="text" icon="el-icon-back" @click="undo" :disabled="!historyImageData.length > 0"></el-button>
+                <el-button type="text" icon="el-icon-right" @click="redo" :disabled="!newHistoryImageData.length > 0"></el-button>
+              </el-menu-item>
               <el-menu-item index="3-1">
                 <el-button @click="filterObject('line')">直线</el-button>
               </el-menu-item>
@@ -91,9 +104,6 @@
               </el-menu-item>
               <el-menu-item index="3-4">
                 <el-button v-on:click="filterObject('circle')">圆形</el-button>
-              </el-menu-item>
-              <el-menu-item index="3-5">
-                <el-button v-on:click="filterObject('text')">文字框</el-button>
               </el-menu-item>
               <el-menu-item index="3-6">
                 <el-button v-on:click="filterObject()">取消选择</el-button>
@@ -429,7 +439,31 @@ export default {
       } else {
         return false
       }
-    }
+    },
+    //撤销
+    undo() {
+      let historyImageData = this.historyImageData
+      let newHistoryImageData = this.newHistoryImageData
+      if(historyImageData.length > 0){
+        let hisImg = historyImageData.pop()
+        newHistoryImageData.push(hisImg)
+        if(historyImageData.length === 0){
+          this.imageData = null
+          this.clearCanvas()
+        }else{
+          this.context.putImageData(historyImageData[historyImageData.length - 1],0,0)
+        }
+      }
+    },
+    //重做
+    redo(){
+      if(this.newHistoryImageData.length > 0){
+        const newHisImg = this.newHistoryImageData.pop()
+        this.imageData = newHisImg
+        this.context.putImageData(newHisImg,0,0)
+        this.historyImageData.push(newHisImg)
+      }
+    },
   },
   created () {
     this.$axios.get('/getImg?name=' + this.$route.params.name).then(res => {
@@ -535,13 +569,13 @@ export default {
     window.onresize = function () {
       self.init()
     }
-    // document.getElementById("lwRange").onchange = function () {
-    //   self.lwidth = parseInt(document.getElementById("lwRange").value)
-    // }
-    // document.getElementById("lcolor").onchange = function () {
-    //   self.context.fillStyle = document.getElementById("lcolor").value
-    //   self.context.strokeStyle = document.getElementById("lcolor").value
-    // }
+    document.getElementById("lwRange").onchange = function () {
+      self.lwidth = parseInt(document.getElementById("lwRange").value)
+    }
+    document.getElementById("lcolor").onchange = function () {
+      self.context.fillStyle = document.getElementById("lcolor").value
+      self.context.strokeStyle = document.getElementById("lcolor").value
+    }
     this.listen()
     // this.initWebSocket()
   },
@@ -566,7 +600,6 @@ function curImage (filter) {
 
   context.drawImage(img, 0, 0, processImg.width, processImg.height)
   let newImageData = filter(context.getImageData(0, 0, processImg.width, processImg.height), context)
-  // console.log(filter + '\n' + newImageData)
   context.putImageData(newImageData, 0, 0)
 
   processImg.imgSrc = canvas
@@ -660,6 +693,7 @@ function convolution (imageData, ctx) {
   left: 216px;
   top: 68px;
   z-index: 10;
+  pointer-events: none;
 }
 #myCanvas {
   position: absolute;
